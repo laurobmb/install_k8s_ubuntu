@@ -40,3 +40,55 @@ spec:
     targetPort: 8080
     protocol: TCP
 
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: app3-certificate
+  namespace: app3
+spec:
+  commonName: w0rm30.seg.br
+  dnsNames:
+    - app3.w0rm30.seg.br
+  secretName: app3-secret 
+  issuerRef:
+    name: app3-issuer
+    kind: Issuer
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app3-ingress-tls
+  namespace: app3
+  annotations:
+   kubernetes.io/ingress.class: nginx
+   nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+   nginx.ingress.kubernetes.io/ssl-redirect: "true"
+   nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  tls:
+  - hosts:
+    - app3.w0rm30.seg.br
+    secretName: app3-secret
+  rules:
+  - host: app3.w0rm30.seg.br
+    http:
+      paths:
+      - backend:
+          service:
+            name: hello-service
+            port: 
+              number: 80
+        path: /
+        pathType: Prefix
+
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Issuer
+metadata:
+  name: app3-issuer
+  namespace: app3
+spec:
+  ca:
+    secretName: app3-rootca

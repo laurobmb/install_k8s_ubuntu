@@ -1,79 +1,39 @@
-# DICA
+## DICA
 source <(kubectl completion bash)
 
-kubectl label node NOME_DO_NODE node-role.kubernetes.io/worker=worker
+## Ajuste no metritcs
 
-kubectl label node kubernetes-worker node-role.kubernetes.io/worker=worker
-kubectl label node kube02.trf5.gov.br node-role.kubernetes.io/worker=worker
+Edite o deployment do metrics que fina no namespace kube-system
 
+> kubectl -n kube-system edit deployments metrics-server
 
-sudo hostnamectl set-hostname kubernetes-master
+	spec:
+      containers:
+        command:
+          - /metrics-server
+          - --metric-resolution=5s
+          - --kubelet-preferred-address-types=InternalIP
+          - --kubelet-insecure-tls
 
-sudo hostnamectl set-hostname kubernetes-worker
+> kubectl top nodes
+> kubectl top pods
 
-sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+## Ajuste no nginx 
 
-sudo swapoff -a
+Coloque os endereços IPv4 que devem responder pelo acesso aos serviços internos do cluster
 
-sudo modprobe overlay
+> kubectl -n ingress-nginx get svc
 
-sudo modprobe br_netfilter
+> kubectl -n ingress-nginx edit svc my-ingress-nginx-ingress
 
-cat << EOF >>/etc/sysctl.d/99-kubernetes-cri.conf
-net.bridge.bridge-nf-call-iptables  = 1
-net.ipv4.ip_forward                 = 1
-net.bridge.bridge-nf-call-ip6tables = 1
-EOF
+	spec:
+	  externalIPs:
+	    - 192.168.123.206
+	    - 192.168.123.218
+	    - 192.168.123.144
 
-sudo sysctl --system
+> kubectl -n ingress-nginx get svc
 
-sudo apt update
-
-sudo apt -y upgrade
-
-export OS=xUbuntu_20.04
-export VERSION=1.18
-
-echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
-echo "deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/$VERSION/$OS/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:$VERSION.list
-
-curl -L https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:$VERSION/$OS/Release.key | apt-key add -
-curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/$OS/Release.key | apt-key add -
-
-apt update
-
-apt install -y cri-o cri-o-runc
-
-Edit the /etc/crio/crio.conf file as follows:
-
-conmon = "/usr/bin/conmon"         #<-- Edit this line. Around line 108
-
-registries = [                     #<-- Edit and add registries. Around line 351
-        "docker.io",
-        "quay.io",
-]
-
-
-sudo systemctl daemon-reload
-sudo systemctl enable crio
-sudo systemctl start crio
-sudo systemctl status crio
-
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
-
-sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
-
-sudo apt -y install kubeadm kubelet kubectl kubernetes-cni
-
-cat << EOF >>/etc/default/kubelet
-KUBELET_EXTRA_ARGS=--feature-gates="AllAlpha=false,RunAsGroup=true" --container-runtime=remote --cgroup-driver=systemd --container-runtime-endpoint='unix:///var/run/crio/crio.sock' --runtime-request-timeout=5m
-EOF
-
-sudo kubeadm init --apiserver-advertise-address=192.168.123.206 --pod-network-cidr=10.244.0.0/16
-
-kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-
-kubectl get pods --all-namespaces
 
 
 
