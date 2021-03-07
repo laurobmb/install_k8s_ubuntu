@@ -1,0 +1,7 @@
+---
+# tasks file for install
+
+- include: pre.yml
+- include: install_crio.yml
+- include: install_k8s.yml
+

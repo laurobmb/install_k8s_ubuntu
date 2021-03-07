@@ -1,0 +1,43 @@
+- name: install chave
+  shell: curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
+  tags: k8s
+
+- name: install repo
+  shell: apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+  tags: k8s
+
+- name: Only run "update_cache=yes" if the last one is more than 3600 seconds ago
+  apt:
+    update_cache: yes
+
+- name: Install k8s
+  apt:
+    name: "{{item}}"
+    state: present
+  with_items:
+  - kubeadm
+  - kubelet
+  - kubectl
+  - kubernetes-cni
+  tags: k8s
+
+- name: copy 99-kubernetes-cri.conf
+  copy:
+    src: ./files/99-kubernetes-cri.conf 
+    dest: /etc/sysctl.d/99-kubernetes-cri.conf
+  tags: k8s
+
+- name: copy kubelet
+  copy: 
+    src: ./files/kubelet
+    dest: /etc/default/kubelet
+
+
+
+#
+#sudo kubeadm init --apiserver-advertise-address=192.168.123.206 --pod-network-cidr=10.244.0.0/16
+#
+#kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+#
+#kubectl get pods --all-namespaces
+

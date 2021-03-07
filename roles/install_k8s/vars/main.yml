@@ -1,0 +1,5 @@
+---
+master: kube01
+node: kube02
+os: "xUbuntu_20.04"
+version: "1.18"

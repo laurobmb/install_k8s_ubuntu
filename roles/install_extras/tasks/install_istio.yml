@@ -1,0 +1,7 @@
+- name: Install ISTIO
+  unarchive:
+    src: https://github.com/istio/istio/releases/download/{{ISTIO_VERSION}}/istioctl-{{ISTIO_VERSION}}-linux-amd64.tar.gz
+    dest: /usr/local/bin/
+    remote_src: True
+  vars:
+    ISTIO_VERSION: 1.7.3

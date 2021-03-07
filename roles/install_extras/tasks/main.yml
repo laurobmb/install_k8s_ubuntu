@@ -1,0 +1,8 @@
+---
+
+- include: install_helm.yml
+- include: install_istio.yml
+- include: install_certmanager.yml
+- include: install_metrics.yml
+- include: install_dashboard.yml
+- include: install_ingress_nginx.yml

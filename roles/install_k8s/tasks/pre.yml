@@ -1,0 +1,32 @@
+#- name: Set a hostname
+#  ansible.builtin.hostname:
+#    name: kubernetes-master
+#  when: ansible_default_ipv4.address is 192.168.123.206
+
+- name: Desativando a swap
+  shell: swapoff -a
+
+- name: Ativando modules
+  shell: modprobe br_netfilter
+
+- name: Ativando modules
+  shell:  modprobe overlay
+
+- name: Habilitando IP Forward
+  shell: echo '1' > /proc/sys/net/ipv4/ip_forward
+
+- name:  Habilitando BRIDGE Iptables
+  shell: echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
+
+- name: Removendo swap do FSTAB
+  replace:
+    path: /etc/fstab
+    regexp: '(.*swap*)' 
+    replace: '#\1'
+
+
+- name: Aplicando modulos sysctl
+  shell:  sysctl --system
+
+
+

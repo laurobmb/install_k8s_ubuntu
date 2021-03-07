@@ -1,0 +1,43 @@
+- name: Install repo cri-o
+  shell: echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ os }}/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+  tags: crio
+
+- name: Install repo cri-o
+  shell: echo "deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ version }}/{{ os }}/ /" > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable:cri-o:{{ version }}.list
+  tags: crio
+
+- name: Install chave cri-o
+  shell: curl -L https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:{{ version }}/{{ os }}/Release.key | apt-key add -
+  tags: crio
+
+- name: Install chave cri-o
+  shell: curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ os }}/Release.key | apt-key add -
+  tags: crio
+
+- name: Only run "update_cache=yes" if the last one is more than 3600 seconds ago
+  apt:
+    update_cache: yes
+
+- name: Install cri-o
+  apt:
+    name: "{{item}}"
+    state: present
+  with_items:
+  - cri-o
+  - cri-o-runc
+  tags: crio
+
+- name: copy config
+  copy:
+    src: ./files/crio.conf
+    dest: /etc/crio/crio.conf
+    backup: yes
+  tags: crio
+
+- name: Service Cri-O
+  ansible.builtin.systemd:
+    name: crio
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  tags: crio

@@ -1,0 +1,19 @@
+- name: Habilitando repo HELM Ingress NGINX Kubernetes.
+  shell: helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+  when: INSTALL_INGRESS|bool
+
+- name: Atualizando repo HELM Ingress NGINX Kubernetes.
+  shell: helm repo update
+  when: INSTALL_INGRESS|bool
+
+- name: Create a k8s namespace
+  shell: kubectl create namespace ingress-nginx
+  ignore_errors: True
+
+- name: Instalando repo HELM Ingress NGINX Kubernetes.
+  shell: helm install my-ingress ingress-nginx/ingress-nginx --namespace=ingress-nginx 
+  when: INSTALL_INGRESS|bool  
+  ignore_errors: True
+
+
+
