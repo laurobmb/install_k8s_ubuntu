@@ -5,3 +5,4 @@
     remote_src: True
   vars:
     ISTIO_VERSION: 1.7.3
+  when: INSTALL_ISTIO|bool

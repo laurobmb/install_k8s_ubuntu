@@ -7,4 +7,5 @@
       - --strip=1
       - --wildcards
       - '*/helm'
+  when: INSTALL_HELM|bool
 

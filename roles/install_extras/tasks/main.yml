@@ -2,6 +2,7 @@
 
 - include: install_helm.yml
 - include: install_istio.yml
+- include: install_gloo.yml
 - include: install_certmanager.yml
 - include: install_metrics.yml
 - include: install_dashboard.yml

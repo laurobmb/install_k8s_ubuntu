@@ -1,0 +1,22 @@
+
+- name: Create symbolic link to python3
+  file:
+    src: "/usr/bin/python3"
+    dest: "/usr/bin/python"
+    state: link
+
+- name: Install GLOO
+  shell: curl -sL https://run.solo.io/gloo/install | sh  
+  args:
+   chdir: $HOME
+   creates: install_istio.log
+  when: INSTALL_GLOO|bool
+
+- name: Create symbolic link to python3
+  file:
+    src: "/root/.gloo/bin/glooctl"
+    dest: "/usr/bin/glooctl"
+    state: link
+
+
+
